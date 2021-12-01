@@ -11,17 +11,17 @@ namespace ns3 {
 class Battery : public Device {
 
 protected:
-	double capacity;
-	double power;
-	double charge;
-	double lastCharge;
-	double minCharge;
-	double desiredCharge;
-	double chargeRateInterval;
+	double capacity; //wie viel Kapazität hat der Speicher
+	double power; //Ladeleistung
+	double charge; //Energie im Speicher drin
+	double lastCharge; //im vorheriger Tick an Energie im Speicher drin
+	double minCharge; //gesetzt als minimaler Ladefüllstand
+	double desiredCharge; //gewünschter
+	double chargeRateInterval; //länge des Ticks mit berücksichtigen
 	int chargeStatId;
 	int pChargeStatId;
 	double chargeRateH;
-	double efficiency;
+	double efficiency; // 0,95 evtl, verluste berücksichtigen
 
 public:
 	Battery(std::string id);

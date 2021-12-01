@@ -1,5 +1,6 @@
 def configure(conf):
 	conf.env['libjsoncpp'] = conf.check(mandatory=True, lib='jsoncpp', uselib_store='LIBJSONCPP')
+	conf.check(lib="mosquitto")
 
 def build(bld):
 	module = bld.create_ns3_module('siena', ['core', 'internet', 'flow-monitor', 'lte', 'plc', 'network', 'brite', 'nix-vector-routing']) # 'visualizer'
@@ -36,7 +37,11 @@ def build(bld):
 		'simulator/DataBasis.cc',
 		'modules/network/tree/NetworkTree.cc'
 	]
-
+	
+	bld(use="mosquitto")
+	
+	module.uselib = 'mosquitto'
+	
 	headers = bld(features='ns3header')
 	headers.module = 'siena'
 	headers.source = [

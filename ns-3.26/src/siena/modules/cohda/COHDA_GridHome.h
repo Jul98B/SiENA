@@ -492,6 +492,7 @@ void COHDA_GridHomeOptimise(ConventionalHome* home) {
 			else if(MyConfig::Get()->getString("com_net") == "lte" && newToken->getPacket()->GetSize() < (uint) MyConfig::Get()->getInt("homes")*40) {//otherwise, K>4 & homes=1000 does not converge wit hplc
 				t = MicroSeconds(i * MyConfig::Get()->getInt("schedule_time_ms") * MyConfig::Get()->getInt("backoff_percentage") * 10);
 			}
+
 			gridhome->scheduleSend(t, (*recipients)[i], newToken->getPacket());
 		}
 		#ifndef TURBO

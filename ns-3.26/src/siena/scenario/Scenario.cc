@@ -31,6 +31,8 @@ void Scenario::initRandom() {
 
 	bool addBackgroundTraffic = c->getDouble("background_traffic") > 0;
 
+
+
 	int count = 0;
 	for(int i = 0; i < clusters; i++) {
 		ClusterConfig* cluster = new ClusterConfig;
@@ -113,6 +115,7 @@ void Scenario::initRandom() {
 			if(addBackgroundTraffic && home->getType() == CONFIG_TYPE_GRID)
 				home->addDevice("traffic", "", random->get());
 			cluster->addHome(home);
+
 		}
 		this->clusters.push_back(cluster);
 	}
@@ -135,7 +138,6 @@ void Scenario::initRandom() {
 		purgeHeatDevice(&ownCHPS, targetCHPS, "chps", "heatpump", &ownHeatpump, "heatingrod", &ownRod);
 	}
 	purgeHeatDevice(&ownRod, targetRod, "heatingrod", "heatpump", &ownHeatpump, "chps", &ownCHPS);
-
 
 }
 

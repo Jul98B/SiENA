@@ -34,6 +34,8 @@ public:
 	}
 
 	void addHome(ConventionalHome* home, int type, int cluster) {
+		//Log::f("Simulator", "home container add home aufgerufen   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+		//std::cout << "HALOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO" << std::endl;
 		homes.push_back(home);
 		(*linker[cluster])[type]->push_back(home);
 	}

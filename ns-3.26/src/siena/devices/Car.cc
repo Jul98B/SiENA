@@ -3,10 +3,11 @@
 namespace ns3 {
 
 Car::Car(std::string id) : Battery(id), numRides(0), numFailedRides(0) {
-	fuel = 171.6;
+	fuel = 171.6; //start wert für ein Auto? hier ein get irgendwo her für jeweiliges Auto?
 	capacity = 24000;
 //	charge = capacity / 2 + (Random::Get()->get() % ((int) capacity / 2));
 	minCharge = capacity * MyConfig::Get()->getDouble("car_min_charge");
+	std::cout << "min charge: " << minCharge << std::endl;
 	charge = minCharge + (Random::Get()->get() % ((int) (capacity - minCharge)));
 	desiredCharge = capacity * MyConfig::Get()->getDouble("car_desired_charge");
 

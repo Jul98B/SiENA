@@ -17,6 +17,7 @@ protected:
 
 public:
 	Car(std::string id);
+	
 	virtual ~Car() {}
 	virtual void init(Json::Value config);
 	virtual void setState(int state, int data = 0);

@@ -126,6 +126,7 @@ static void pppm_home_handlePriceUpdate(GridHome* home, PPPM_Update* up) {
 		Log::i(home->getId(), "\tsending bid to concentrator");
 		std::string serverIp = *((std::string*) home->getData<std::string>("serverIp"));
 		Time t = MicroSeconds(Random::Get()->get(0, MyConfig::Get()->getInt("pm_backoff")));
+
 		home->scheduleSend(t, serverIp, bid->getPacket());
 	}
 

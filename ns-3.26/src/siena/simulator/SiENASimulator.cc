@@ -19,10 +19,10 @@ SiENASimulator::SiENASimulator() {
 	// init times
 	Tick::Get();
 
-	//c->print();
+	//c->print(); //nur ausgabe der config datei
 
 	// init modules
-	Modules::Get()->execute(c->getString("init_modules"), NULL);
+	Modules::Get()->execute(c->getString("init_modules"), NULL); //empty und dewegen wird nichts gemacht
 
 	// stuff
 	progress = new Progress;
@@ -44,6 +44,7 @@ SiENASimulator::SiENASimulator() {
 
 	apps.Start(Seconds(0.1)); //100 Miliseconds due to LTE Start (synchronised to PowerMatcher)
 
+	Log::f("Init Scheduler ", c->getString("init_scheduler"));
 	Modules::Get()->execute(c->getString("init_scheduler"), NULL);
 }
 

@@ -146,7 +146,7 @@ DefaultSimulatorImpl::ProcessOneEvent (void)
   m_currentTs = next.key.m_ts;
   m_currentContext = next.key.m_context;
   m_currentUid = next.key.m_uid;
-  next.impl->Invoke ();
+  next.impl->Invoke ();                 //Impl: Pointer to Event implementation, führt also das Event aus?     EVENT AUSFÜHREN
   next.impl->Unref ();
 
   ProcessEventsWithContext ();
@@ -167,8 +167,8 @@ DefaultSimulatorImpl::ProcessEventsWithContext (void)
     }
 
   // swap queues
-  EventsWithContext eventsWithContext;
-  {
+  EventsWithContext eventsWithContext; 
+  { //Block: tauscht Listen bzw leert die alte und füllt die neue Eventliste?
     CriticalSection cs (m_eventsWithContextMutex);
     m_eventsWithContext.swap(eventsWithContext);
     m_eventsWithContextEmpty = true;
@@ -184,7 +184,7 @@ DefaultSimulatorImpl::ProcessEventsWithContext (void)
        ev.key.m_uid = m_uid;
        m_uid++;
        m_unscheduledEvents++;
-       m_events->Insert (ev);
+       m_events->Insert (ev); //Ptr<Scheduler> mit allen Events
     }
 }
 
@@ -192,14 +192,20 @@ void
 DefaultSimulatorImpl::Run (void)
 {
   NS_LOG_FUNCTION (this);
+
+  std::cout << "Ich bin eine DefaultSimulatorImpl" << std::endl;
+
   // Set the current threadId as the main threadId
   m_main = SystemThread::Self();
-  ProcessEventsWithContext ();
+
+  //hier passiert: ... SchedulerEvents speichern für später zum abarbeiten?
+  ProcessEventsWithContext (); //Funktion ist direkt hier drüber definiert
   m_stop = false;
 
   while (!m_events->IsEmpty () && !m_stop) 
     {
-      ProcessOneEvent ();
+      //Hier passiert: ... abarbeiten der Scheduler Events aus Liste?
+      ProcessOneEvent (); //Funktion ist hier drüber definiert
     }
 
   // If the simulator stopped naturally by lack of events, make a

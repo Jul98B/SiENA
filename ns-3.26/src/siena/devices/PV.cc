@@ -28,6 +28,7 @@ void PV::init(Json::Value config) {
 void PV::tick() {
 	if(lastTick != t->getTick()) {
 		if(state == DEV_ON)
+			//adaptedConsumption = privater double vom Device (geerbt)
 			adaptedConsumption = -round((*consumption)[(t->getMinute() / interval) % consumption->size()] * size);
 		else
 			adaptedConsumption = 0;

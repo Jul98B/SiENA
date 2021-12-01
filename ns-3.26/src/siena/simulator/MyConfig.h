@@ -95,6 +95,8 @@ public:
 		if(v == Json::Value::null)
 			throw("config parameter " + name + " not available");
 		if(v.isConvertibleTo(Json::stringValue))
+
+			//Log::f("Julie :D ", v.asString());
 			return v.asString();
 		throw("could not convert config entry " + name + " to string");
 	}

@@ -8,21 +8,25 @@
 
 namespace ns3 {
 
-static void priv_GridHomeHandleDataToken(GridHome* home, Priv_TokenData* token) {
+static void priv_GridHomeHandleDataToken(GridHome* home, Priv_TokenData* token) { //wird über umwege aus der Registry aufgerufen/registriert :(
 	Adaption* adaption = home->getAdaption();
 
-	// gather flex data
+	// gather flex data = Sammeln aller Möglichkeiten zur Energieverschiedung etc.
 	AdaptionFlex* flex = adaption->getFlex();
 	if(flex->isAdaptable()) {
-		if(flex->isAdaptableUp())
+		if(flex->isAdaptableUp()){
+			//std::cout << "IsAdaptableUp: " << std::to_string(flex->getPotentialUp()) << std::endl;
 			token->addFlexUp(flex->getPotentialUp());
-		if(flex->isAdaptableDown())
+		}
+		if(flex->isAdaptableDown()){
+			//std::cout << "IsAdaptableDown: " << std::to_string(flex->getPotentialUp()) << std::endl;
 			token->addFlexDown(flex->getPotentialDown());
-		token->addCurrent(adaption->getBase() + flex->getDesired());
+		}
+		token->addCurrent(adaption->getBase() + flex->getDesired()); //hier könnte man was am Ziel ändern?
 	} else
 		token->addCurrent(adaption->getBase());
 
-	// switch devices
+	// switch devices = Sammeln der Möglichkeiten zum an und aus schalten
 	if(adaption->isOnOffAdaptable()) {
 		std::vector<AdaptionOnOff*>* prio = adaption->getOnOff();
 		for(uint i = 0; i < prio->size(); i++) {
@@ -129,7 +133,7 @@ static void priv_GridHomeHandleAdaptToken(GridHome* home, Priv_TokenAdapt* token
 	home->scheduleSend(token->next(), token->getPacket());
 }
 
-static void priv_GridHomeHandleToken(std::vector<void*>* params) {
+static void priv_GridHomeHandleToken(std::vector<void*>* params) { //wird in Regsitry.h gespeichert... unter Stichwort im Code zu finden: gridhome_handle_token
 	GridHome* home = (GridHome*) (*params)[0];
 	Token* token = (Token*) (*params)[1];
 	Priv_TokenData* tokenData = dynamic_cast<Priv_TokenData*>(token);

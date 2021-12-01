@@ -3,9 +3,9 @@
 	"seed": 1337,						// seed
 
 
-	"start_date": "01.05.11",			// start date of simulation, has to comply with data_start_date
-	"duration": "3d",					// duration of simulation, y (years), d (days), h (hours), min (minutes)
-	"interval": "15min",					// simulation step interval
+	"start_date": "01.03.11",			// start date of simulation, has to comply with data_start_date
+	"duration": "1d",					// duration of simulation, y (years), d (days), h (hours), min (minutes)
+	"interval": "30min",					// simulation step interval
 	"log_all": false,					// show log messages, slows down simulation, check src/simulation/Turbo.h for even more speed
 	"data_start_date": "01.01.11",		// start date of data, currently data available from 01.01.11 to 31.12.13
 										//   -> this date is tick 0
@@ -14,7 +14,7 @@
 	"scenario": "scenario_tank_size_test",		// the scenario file in data/scenario/
 
 	"clusters": 1,						// number of clusters
-	"homes": 100,						// number of households in a cluster
+	"homes": 10,						// number of households in a cluster
 	"smarthome_share": 0.0,				// share of smart homes
 	"gridhome_share": 1.0,				// share of grid homes -> remaining share are conventional homes
 	
@@ -22,14 +22,14 @@
 	"own_washingmachine": 0.945,		// possession rate (based on total number of households)
 	"own_dishwasher": 0.673,
 	"own_drier": 0.391,
-	"own_pv": 0.4,
+	"own_pv": 0.6,
 	"own_battery": 0.4,					
 	"own_heat": 0.4,					// -> heat device in general
 		"own_heatingrod": 0.0,			// ---> percentage of general heat device
 		"own_heatpump": 0.8,
 		"own_chps": 0.2,
 	"own_car_override": -1,				// -> -1: use scenario data, 0-x: static number of cars in household, MAX 4!!!
-	"own_car": 0.4,						// -> percentage of number of cars
+	"own_car": 0.5,						// -> percentage of number of cars
 
 	
 	"dsm_mode": "load_shaping",		// load_shaping or peak_clipping
@@ -46,7 +46,7 @@
 	"battery_desired_charge": 0.5,							// battery wants to be charged by x% if possible
 	"car_min_charge": 0.9,								// car has to be charged by x % to perform DSM
 	"car_desired_charge": 0.95,							// car wants to be charged by x% if possible
-	"car_charge_rate": "0.75,2400,0.2,11000,0.05,22000",// car charge rate (probability,rate in W)  
+	"car_charge_rate": "0.25,2400,0.7,11000,0.05,22000",// car charge rate (probability,rate in W)  
 	"heatingrod_min_critical": 0.15,							// tank has to be charged by x %
 	"heatingrod_max": 0.3,							// tank is desired to be charged by x %
 	"heatpump_min_critical": 0.5,							// tank has to be charged by x %

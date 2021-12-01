@@ -1,0 +1,60 @@
+name: mosquitto
+version: 2.0.14
+summary: Eclipse Mosquitto MQTT broker
+description: This is a message broker that supports version 5.0, 3.1.1, and 3.1 of
+  the MQTT protocol. MQTT provides a method of carrying out messaging using a publish/subscribe
+  model. It is lightweight, both in terms of bandwidth usage and ease of implementation.
+  This makes it particularly useful at the edge of the network where a sensor or other
+  simple device may be implemented using an arduino for example.
+apps:
+  ctrl:
+    command: usr/bin/mosquitto_ctrl
+    plugs:
+    - home
+    - network
+    command-chain:
+    - snap/command-chain/snapcraft-runner
+  mosquitto:
+    command: launcher.sh
+    daemon: simple
+    restart-condition: always
+    plugs:
+    - home
+    - network
+    - network-bind
+    command-chain:
+    - snap/command-chain/snapcraft-runner
+  passwd:
+    command: usr/bin/mosquitto_passwd
+    plugs:
+    - home
+    command-chain:
+    - snap/command-chain/snapcraft-runner
+  pub:
+    command: usr/bin/mosquitto_pub
+    plugs:
+    - home
+    - network
+    command-chain:
+    - snap/command-chain/snapcraft-runner
+  rr:
+    command: usr/bin/mosquitto_rr
+    plugs:
+    - home
+    - network
+    command-chain:
+    - snap/command-chain/snapcraft-runner
+  sub:
+    command: usr/bin/mosquitto_sub
+    plugs:
+    - home
+    - network
+    command-chain:
+    - snap/command-chain/snapcraft-runner
+architectures:
+- amd64
+assumes:
+- command-chain
+base: core18
+confinement: strict
+grade: stable

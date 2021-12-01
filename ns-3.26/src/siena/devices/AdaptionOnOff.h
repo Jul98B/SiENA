@@ -35,6 +35,7 @@ public:
 		#ifndef TURBO
 			std::stringstream s;
 			s << "#" << value << " ♥" << (desired ? "true" : "false") << " →" << current;
+			//std::cout << << "#" << value << " ♥" << (desired ? "true" : "false") << " →" << current << std::endl;
 			return s.str();
 		#else
 			return "optimized out";

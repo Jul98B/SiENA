@@ -1,0 +1,7 @@
+.vscode/*
+*/.vscode/*
+*.o
+*.so
+*.txt
+*.pyc
+*build*

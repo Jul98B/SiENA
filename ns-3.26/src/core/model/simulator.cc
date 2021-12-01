@@ -127,6 +127,8 @@ static SimulatorImpl **PeekImpl (void)
 static SimulatorImpl * GetImpl (void)
 {
   SimulatorImpl **pimpl = PeekImpl ();
+  //std::cout << "Peek Impl geholt?!" << std::endl; //viel zu häufig
+
   /* Please, don't include any calls to logging macros in this function
    * or pay the price, that is, stack explosions.
    */
@@ -202,7 +204,9 @@ Simulator::Run (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
   Time::ClearMarkedTimes ();
+  std::cout << "Start RUN!?" << std::endl;
   GetImpl ()->Run ();
+  std::cout << "Run fertig?!" << std::endl;
 }
 
 void 

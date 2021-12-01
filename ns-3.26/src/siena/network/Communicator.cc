@@ -38,9 +38,9 @@ void Communicator::sendOverNetwork(std::string destination, Ptr<Packet> packet, 
 
 void Communicator::sendDirectly(std::string destination, Ptr<Packet> packet) {
 	std::map<std::string, Recipient*>::iterator it = recipients.find(destination);
-	if(it != recipients.end())
-		it->second->handlePacket(packet);
-	else
+	if(it != recipients.end()){
+		it->second->handlePacket(packet); // HIER IST ES WICHTIG!
+	} else
 		throw("destination " + destination + " not registered at communicator");
 }
 

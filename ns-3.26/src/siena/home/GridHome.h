@@ -16,6 +16,8 @@
 #include "ns3/PacketLog.h"
 #include "ns3/PacketLogger.h"
 
+#include <string>
+
 namespace ns3 {
 
 class GridHome : public ConventionalHome, public Application, public Recipient, public GenericDataStorage {
@@ -48,6 +50,8 @@ public:
 	int getSimEnd() { return simEnd; }
 	virtual void tick();
 	Ipv4Address getIp() { return ip; }
+
+	void toJson(std::string* payload){/*erstmal leer lassen*/};
 
 protected:
 	virtual void schedule(DeviceEvent* event);

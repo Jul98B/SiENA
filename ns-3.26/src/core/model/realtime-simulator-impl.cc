@@ -422,6 +422,8 @@ RealtimeSimulatorImpl::Run (void)
 {
   NS_LOG_FUNCTION (this);
 
+  std::cout << "Ich bin eine RealtimeSimulatorImpl" << std::endl;
+
   NS_ASSERT_MSG (m_running == false, 
                  "RealtimeSimulatorImpl::Run(): Simulator already running");
 

@@ -14,6 +14,11 @@
 #include "ns3/TraceHelper.h"
 #include "ns3/plc-defs.h"
 
+
+#include <iostream>
+#include <fstream>
+#include <string>
+
 using namespace ns3;
 
 int main(int argc, char* argv[]) {
@@ -40,9 +45,9 @@ int main(int argc, char* argv[]) {
 
 //		DataBasis::Get()->convertFilesToBinary();
 
-		registerModules();
+		registerModules(); //alle Fubktionspointer zu Stichpunkten in Liste schreiben 
 
-		SiENASimulator sim;
+		SiENASimulator sim; //in dem Konstruktor wird ganze Simulation mit Cluste und Homeconfig erstellt
 		time_t initEnd = time(NULL);
 
 //		PointToPointHelper p2p;
@@ -50,8 +55,61 @@ int main(int argc, char* argv[]) {
 //		FlowMonitorHelper flowmon;
 //		Ptr<FlowMonitor> monitor = flowmon.InstallAll();
 
-		Log::f("Simulator", "starting simulation...");
+		//Log::f("Simulator", "starting simulation...");
+
 		Simulator::Run();
+
+		/*
+		//Hier aus log-Datei lesen und über MQTT schicken?
+		std::string filename1("gridhomes_config.txt");
+		std::string s;
+		std::string payload = "Config: \\n";
+
+		std::ifstream input_file1(filename1);
+		if (!input_file1.is_open()) {
+			std::cerr << "Could not open the file - '"
+					<< filename1 << "'" << std::endl;
+
+			return EXIT_FAILURE;
+		}
+
+		while (input_file1 >> s) {
+			payload += s;
+		}
+
+		std::cout << "Payload config: " << std::endl;
+		std::cout << payload << std::endl;
+
+		std::cout << std::endl;
+		input_file1.close();
+
+		payload += "Log: \\n";
+
+		//hier log auslesen und an Payload anhaengen:
+		std::string filename2("gridhome_setAdaption.txt");
+		std::ifstream input_file2(filename2);
+		if (!input_file2.is_open()) {
+			std::cerr << "Could not open the file - '"
+					<< filename2 << "'" << std::endl;
+
+			return EXIT_FAILURE;
+		}
+
+		while (input_file2 >> s) {
+			payload += s;
+		}
+
+		std::cout << "Payload config + log: " << std::endl;
+		std::cout << payload << std::endl;
+
+		std::cout << std::endl;
+		input_file2.close();
+
+		//HIER MQTT CLIENT STARTEN UND PAYLOAD MIT QoS 0 (weniger Overhead) SCHICKEN
+		//... keine Ahnung wie...   */
+
+
+		//Log::f("Julie :D ", "end simulation... !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
 //		monitor->CheckForLostPackets ();
 //		std::map<FlowId, FlowMonitor::FlowStats> stats = monitor->GetFlowStats();

@@ -14,11 +14,31 @@
 #include "ns3/Car.h"
 #include "ns3/Adaption.h"
 
+
+#include "ns3/core-module.h"
+#include "ns3/siena-module.h"
+#include <string>
+#include <ctime>
+#include "ns3/MyStats.h"
+#include "ns3/StatsExporter.h"
+#include "ns3/StatsAnalyzer.h"
+#include "ns3/Rscript.h"
+#include "ns3/MyConfig.h"
+#include "ns3/Tick.h"
+#include "ns3/Registry.h"
+#include "ns3/flow-monitor-module.h"
+#include "ns3/point-to-point-module.h"
+#include "ns3/TraceHelper.h"
+#include "ns3/plc-defs.h"
+
 namespace ns3 {
 
 // TODO use devices/cost.csv (dsm/cost.csv is only for one day)
 
 static void smarthome_shift(std::vector<void*>* params) {
+	//Log wird nie ausgegeben?
+	Log::f("	:D ", "smarthomeshift aufgerufen   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+	std::cout << "HALOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO" << std::endl;
 	SmartHome* home = (SmartHome*) (*params)[0];
 	DeviceEvent* event = (DeviceEvent*) (*params)[1];
 	std::vector<double>* costList = (*DataBasis::Get()->get("dsm/cost"))[0];
@@ -52,6 +72,9 @@ static void smarthome_shift(std::vector<void*>* params) {
 }
 
 static void smarthome_battery(std::vector<void*>* params) {
+	//Log wird nie ausgegeben?
+	Log::f("	:D ", "smarthomebattery aufgerufen   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+	std::cout << "HALOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO" << std::endl;
 	Battery* bat = (Battery*) (*params)[1];
 
 	if(bat->isAdaptable()) {
@@ -71,6 +94,9 @@ static void smarthome_battery(std::vector<void*>* params) {
 
 static void smarthome_car(std::vector<void*>* params) {
 	Car* car = (Car*) (*params)[1];
+
+	Log::f("Simulator", "smarthomeshift aufgerufen   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+	std::cout << "HALOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO" << std::endl;
 
 	if(car->isAdaptable()) {
 		int interval = MyConfig::Get()->getInt("interval");

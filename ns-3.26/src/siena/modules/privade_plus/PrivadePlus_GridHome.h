@@ -8,6 +8,8 @@
 namespace ns3 {
 
 static void privadePlus_GridHomeTick(std::vector<void*>* params) {
+	Log::f("Simulator", "privadePlus GridhomeTick aufgerufen   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+	std::cout << "HALOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO" << std::endl;
 	GridHome* home = (GridHome*) params->at(0);
 	MyConfig* config = MyConfig::Get();
 	Tick* tick = Tick::Get();
@@ -138,6 +140,7 @@ static void privadePlus_GridHomeHandleToken(std::vector<void*>* params) {
 
 	Log::i(home->getId(), "\tsending token to aggregator");
 	std::string serverIp = *home->getData<std::string>("serverIp");
+
 	home->scheduleSend(serverIp, tokenAdapt->getPacket());
 
 	delete token;

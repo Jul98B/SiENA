@@ -114,7 +114,7 @@ private:
   /** Flag calling for the end of the simulation. */
   bool m_stop;
   /** The event priority queue. */
-  Ptr<Scheduler> m_events;
+  Ptr<Scheduler> m_events;                                                //was für ein Datentyp ist das?
 
   /** Next event unique id. */
   uint32_t m_uid;

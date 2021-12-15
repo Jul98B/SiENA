@@ -192,9 +192,6 @@ void
 DefaultSimulatorImpl::Run (void)
 {
   NS_LOG_FUNCTION (this);
-
-  std::cout << "Ich bin eine DefaultSimulatorImpl" << std::endl;
-
   // Set the current threadId as the main threadId
   m_main = SystemThread::Self();
 

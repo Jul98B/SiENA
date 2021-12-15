@@ -204,9 +204,9 @@ Simulator::Run (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
   Time::ClearMarkedTimes ();
-  std::cout << "Start RUN!?" << std::endl;
+  //simulation 0-100% werden in naechster Zeile ausgefuert, init ist hier schon fertig
   GetImpl ()->Run ();
-  std::cout << "Run fertig?!" << std::endl;
+  //danach werden nur noch stats exportiert und 
 }
 
 void 

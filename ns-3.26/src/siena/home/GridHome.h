@@ -16,6 +16,8 @@
 #include "ns3/PacketLog.h"
 #include "ns3/PacketLogger.h"
 
+#include <mosquitto.h>
+
 #include <string>
 
 namespace ns3 {
@@ -23,6 +25,9 @@ namespace ns3 {
 class GridHome : public ConventionalHome, public Application, public Recipient, public GenericDataStorage {
 
 protected:
+	struct mosquitto * mosq;
+	int rc;
+
 	Communicator* communicator;
 	Ptr<Socket> listenerSocket;
 	Modules* algo;

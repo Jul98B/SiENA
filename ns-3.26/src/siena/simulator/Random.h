@@ -7,6 +7,7 @@
 #include "ns3/MySingleton.h"
 #include <algorithm>
 #include "ns3/MyConfig.h"
+#include <iostream>
 
 namespace ns3 {
 
@@ -16,9 +17,20 @@ private:
 	double target, value;
 public:
 	RandomForce(double value) : counter(1/(2*value)), target(1/value), value(1/value) {}
-	bool next() {
-		if(++counter > target) {
-			target += value;
+	bool next() { // value groß: haeufiger false, value klein: haeufiger true 
+		/*std::cout << "next in Randomforce: " << std::endl;
+		//anfangs sind Value und Target immer gleich?!?
+		std::cout << "value: " << std::to_string(value) << std::endl; 
+		std::cout << "target: " << std::to_string(target) << std::endl;
+		std::cout << "counter: " << std::to_string(counter) << std::endl;*/
+		
+
+		if(++counter > target) { //counter hochzaehlen fuer naechsten Aufruf
+			target += value; //Target nach oben korrigieren, damit naechster Aufruf nicht automatisch if(true) ist
+			/*
+			std::cout << "if target: " << std::to_string(target) << std::endl;
+			std::cout << "if counter: " << std::to_string(counter) << std::endl;
+			*/
 			return true;
 		}
 		return false;
@@ -108,20 +120,31 @@ public:
 	}
 
 	bool getDev(std::string dev) {
+		//std::cout << "Random: getDev " << dev << std::endl;
+
 		double own = config->getDouble("own_" + dev);
+		//std::cout << "own: " << std::to_string(own) << std::endl;
+
 		if(own > 1)
 			own -= (int) own;
+
 		if(forceOwn) {
+			//std::cout << "forceown" << std::endl;
+
+			//random Double der nicht genutzt wird? 
 			getD(); // dummy, keep
+
 			if(own == 0)
-				return false;
+				return false; //wird nicht hinzugefuegt weil laut config wahrscheinlichkeit = 0
+
 			std::map<std::string, RandomForce*>::iterator it = forceList.find(dev);
 
-			if(it == forceList.end())
-				it = forceList.insert(std::pair<std::string, RandomForce*>(dev, new RandomForce(own))).first;
+			if(it == forceList.end()) //device war noch nicht in der Liste
+				it = forceList.insert(std::pair<std::string, RandomForce*>(dev, new RandomForce(own))).first; //own ist Value in RandomForce
 			return it->second->next();
 		} else {
-			if(getD() <= own)
+			//wird gerade nicht ausgefuehrt
+			if(getD() <= own) 
 				return true;
 			return false;
 		}

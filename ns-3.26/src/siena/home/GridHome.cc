@@ -2,18 +2,6 @@
 #include "../../siena/devices/Car.h" //fuer Car
 #include "../../siena/devices/Battery.h" //fuer Car
 
-/*
-//#include "../paho.mqtt.cpp/src/mqtt/async_client.h" //#include "mqtt/async_client.h"
-//#include "../paho.mqtt.c/src/samples/MQTTAsync_publish.c" //gibt nur noch mehr Fehler...
-
-//aus MQTT Beispiel (an topic_publish.cpp orientiert):
-#include <cstdlib>
-#include <string>
-#include <thread>	// For sleep
-#include <atomic>
-#include <chrono>
-//#include "../paho.mqtt.cpp" //#include "mqtt/async_client.h"
-*/
 
 #include <iostream>
 #include <fstream>
@@ -22,9 +10,8 @@
 #include <mosquitto.h>
 
 
-//#define LOG
-//gcc mqtt_pub.c -o mqtt_pub -lmosquitto //wie sage ich ./waf das der die Bib benutzen soll? 
-#define MQTT  // 6 = Bytelength tauschen = publish minute 7 angucken
+#define LOG
+//#define MQTT 
 
 namespace ns3 {
 
@@ -46,6 +33,25 @@ GridHome::GridHome() : ConventionalHome("error"), token(NULL), lastAdaption(-1) 
 	traceHelper = TraceHelper::Get();
 	packetLog = PacketLog::Get();
 	packetLogger = PacketLogger::Get();
+
+	#ifdef MQTT 
+		//MQTT verbindung erstellen:
+		mosquitto_lib_init();
+
+		//client id, 
+		mosq = mosquitto_new(NULL, true, NULL);
+
+		mosquitto_username_pw_set(mosq,"eow","eow%EMA4");
+		rc = mosquitto_connect(mosq, "131.173.118.68", 18883, 60);
+
+		//rc = mosquitto_connect(mosq, "localhost", 1883, 60);
+		if(rc != 0){
+			printf("Client could not connect to broker! Error Code: %d\n", rc);
+			mosquitto_destroy(mosq);
+			return;
+		}
+		std::cout << "We are now connected to the broker!\n" << std::endl;
+	#endif
 }
 
 void GridHome::StartApplication() {
@@ -62,10 +68,17 @@ void GridHome::StartApplication() {
 
 	ip = GetNode()->GetObject<Ipv4>()->GetAddress(1, 0).GetLocal();
 	communicator->registerRecipient(this, Helper::toString(ip));
+
+	
 }
 
 void GridHome::StopApplication() {
 	listenerSocket->Close();
+	//verbindung trennen und alles wieder aufraemen
+	mosquitto_disconnect(mosq);
+	mosquitto_destroy(mosq);
+
+	mosquitto_lib_cleanup();
 }
 
 void GridHome::tick() {
@@ -109,13 +122,13 @@ void GridHome::handleAccept(Ptr<Socket> socket, const Address& address) {
 	socket->SetRecvCallback(MakeCallback(&GridHome::handleRead, this));
 }
 
-void GridHome::handleRead(Ptr<Socket> socket) { //wo zur Hölle wird das aufgerufen?	garnicht...
+void GridHome::handleRead(Ptr<Socket> socket) { 
 	
 	Ptr<Packet> packet;
 	Address sender;
 	while((packet = socket->RecvFrom(sender))) {
 		if(packetLog->check(packet))
-			handlePacket(packet); //hier evtl. wichtig?
+			handlePacket(packet); 
 		#ifndef TURBO
 		else
 			Log::i(id, "received duplicate packet, discarding, uid: ", packet->GetUid());
@@ -155,106 +168,7 @@ void GridHome::setAdaption() {
 	if(t->getTick() > lastAdaption) {
 		
 		#ifdef MQTT	
-		/*
-			std::string DFLT_SERVER_ADDRESS { "tcp://localhost:1883" };
-
-			std::string TOPIC { "test" };
-			int QOS = 0;
-
-			const char* PAYLOADS[] = {
-				"Hello World!",
-				"Hi there!",
-				"Is anyone listening?",
-				"Someone is always listening.",
-				nullptr
-			};
-
-			const auto TIMEOUT = std::chrono::seconds(10);
-
-
-			//MQTT client anlegen:
-
-			//aus ner main kopiert = adresse selber definieren?
-			std::string address = DFLT_SERVER_ADDRESS;//(argc > 1) ? std::string(argv[1]) : DFLT_SERVER_ADDRESS;
-
-			std::cout << "Initializing for server '" << address << "'..." << std::endl;
-		
-			mqtt::async_client cli(address, "");
-
-			std::cout << "  ...OK" << std::endl;
-
-			try {
-				std::cout << "\nConnecting..." << std::endl;
-				cli.connect()->wait();
-				std::cout << "  ...OK" << std::endl;
-
-				std::cout << "\nPublishing messages..." << std::endl;
-
-				mqtt::topic top(cli, "test", QOS);
-				mqtt::token_ptr tok;
-
-				size_t i = 0;
-				while (PAYLOADS[i]) {
-					tok = top.publish(PAYLOADS[i++]);
-				}
-				tok->wait();	// Just wait for the last one to complete.
-				std::cout << "OK" << std::endl;
-
-				// Disconnect
-				std::cout << "\nDisconnecting..." << std::endl;
-				cli.disconnect()->wait();
-				std::cout << "  ...OK" << std::endl;
-			}
-			catch (const mqtt::exception& exc) {
-				std::cerr << exc << std::endl;
-			} */
-
-			//MOSQUITTO LIB HIER EINFÜGEN
-			//...
-
-
-
-			int rc;
-			struct mosquitto * mosq;
-
-			mosquitto_lib_init();
-/*
-			mosq = mosquitto_new("publisher-test", true, NULL);
-
-			rc = mosquitto_connect(mosq, "localhost", 1883, 60);
-			if(rc != 0){
-				printf("Client could not connect to broker! Error Code: %d\n", rc);
-				mosquitto_destroy(mosq);
-				return -1;
-			}
-			std::cout << "We are now connected to the broker!\n" << std::endl;
-
-			//hier Payload einbauen
-			mosquitto_publish(mosq, NULL, "test", 6, "hierPayload", 0, false);
-
-			mosquitto_disconnect(mosq);
-			mosquitto_destroy(mosq);
-
-			mosquitto_lib_cleanup();
-
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-			/*//zu anfang jedes device einmal in Json schreiben
+			/*zu anfang jedes device einmal in Json schreiben
 			if(lastAdaption == 0){
 				std::string filename("gridhomes_config.txt");
 				std::ofstream file_out;
@@ -266,12 +180,11 @@ void GridHome::setAdaption() {
 
 				std::cout << "config: " << payload << std::endl;
 
-				//hier einmal MQTT schicken!!!
+				//hier einmal MQTT schicken????????????????????????????????????????????????????????????????????????????
 
 				payload = "";
 			} 
 			*/
-			std::string payload = "";
 		#endif
 		
 
@@ -279,14 +192,15 @@ void GridHome::setAdaption() {
 			std::string filename("gridhome_setAdaption.txt"); //in diese Textdatei alle Logs schreiben
 			std::ofstream file_out;
 
-			file_out.open(filename, std::ios_base::app); // statt app evtl out
+			file_out.open(filename, std::ios_base::app); 
 
 			file_out << "{ \"gridhome\":{\"ipAdresse\":\"" << this->getIp() << "\",";
 			file_out << "\"time\":" << t->getTick() << "},"; //zahlt in ganzen Zahlen die Zeitslots
 		#endif
 
 		#ifdef MQTT 
-			payload += "{\"gridhome\":{\"ipAdresse\":\"";//
+			std::string payload = "";
+			payload += "{\"gridhome\":{\"ipAdresse\":\"";
 			payload +=  std::to_string(this->getIp().Get());
 			payload += "\",\"time\":" + std::to_string(t->getTick()) + "},";
 		#endif
@@ -297,46 +211,42 @@ void GridHome::setAdaption() {
 		std::map<std::string, Device*>::iterator it;
 		for(it = devices.begin(); it != devices.end(); ++it) { //durch Liste aller Devices dieses Gridhomes itterieren
 			
-			if(!(std::string(typeid(*it->second).name())).compare("N3ns33CarE")){ //Auto
-				
+			#ifdef LOG || MQTT
+			//devicetype aus der kompletten id holen und ende Abschneiden (angehängte Zahlen bleiben bestehen)
+			std::string id = it->second->getId();
+			std::string deviceType = id.substr(13, id.length()); //Home und Clusternummer abschneiden 
 
-				//abkuerzen:
+			if(deviceType[0] == '_'){ //zweistellige GridHome Nummer: einen mehr abschneiden
+				deviceType = deviceType.substr(1,deviceType.length());
+			} else if(isdigit(deviceType[0])){ //dreistellige Gridhome Nummer: zwei mehr abschneiden
+				deviceType = deviceType.substr(2,deviceType.length());
+			}
+			#endif
+
+			#ifdef LOG 
+				file_out << "\"" << deviceType << "\":{";
+			#endif
+			#ifdef MQTT
+				payload += "\"" + deviceType + "\":{";
+			#endif
+
+			if(!(std::string(typeid(*it->second).name())).compare("N3ns33CarE")){ //Auto: fuel und Charge extra dazu schreiben
 				#ifdef LOG 
-					file_out << "\"car\":{";
 					file_out << "\"fuel\":" << std::to_string(dynamic_cast<Car*>(it->second)->getFuelEconomy());
-					file_out << ",\"charge\":" << std::to_string(dynamic_cast<Battery*>(it->second)->getCharge());
+					file_out << ",\"charge\":" << std::to_string(dynamic_cast<Battery*>(it->second)->getCharge()) << ",";
 				#endif
 
 				#ifdef MQTT
-					payload += "\"car\":{";
 					payload += "\"fuel\":" + std::to_string(dynamic_cast<Car*>(it->second)->getFuelEconomy());
 					payload += ",\"charge\":" + std::to_string(dynamic_cast<Battery*>(it->second)->getCharge()) + ",";
 				#endif
-				
-				
-			} else { //no car
-				std::string id = it->second->getId();
-				std::string deviceType = id.substr(13, id.length()); //Home und Clusternummer abschneiden 
+			} 
 
-				if(deviceType[0] == '_'){ //zweistellige GridHome Nummer: einen mehr abschneiden
-					deviceType = deviceType.substr(1,deviceType.length());
-				} else if(isdigit(deviceType[0])){ //dreistellige Gridhome Nummer: zwei mehr abschneiden
-					deviceType = deviceType.substr(2,deviceType.length());
-				}
-				#ifdef LOG 
-					//file_out << "\"deviceId\":" << deviceType;
-					file_out << "\"" << deviceType << "\":{";
-				#endif	
-				#ifdef MQTT
-					payload += "\"" + deviceType + "\":{";
-				#endif
-
-				
-			}
+			//moegliche Energieverschiebung und aktuellen Verbrauch fuer neuen Zeitpunkt setzen
 			if(it->second->isAdaptable()) {
 				std::pair<AdaptionFlex*, AdaptionOnOff*> a = it->second->getAdaption();
 				if(a.first->isAdaptable()) {
-					minimum += a.first->getMinimum(); //original, bei Auto verändert
+					minimum += a.first->getMinimum(); //bei Auto evtl veraendern: weniger als Batterie nutzen
 					maximum += a.first->getMaximum();
 					desired += a.first->getDesired();
 					#ifdef LOG 
@@ -384,8 +294,7 @@ void GridHome::setAdaption() {
 			lastAdaption = t->getTick();
 
 			#ifdef LOG 
-				file_out << "\"home_total\":{\"min\":" << minimum << ",\"max\":" << maximum << ",\"desired\":" << desired << ",\"base\":" << base << "}}";
-				file_out << "\n";
+				file_out << "\"home_total\":{\"min\":" << minimum << ",\"max\":" << maximum << ",\"desired\":" << desired << ",\"base\":" << base << "}}\n";
 			#endif
 			
 			#ifdef MQTT
@@ -393,10 +302,18 @@ void GridHome::setAdaption() {
 			#endif
 		
 			#ifdef MQTT
-				//HIER MQTT NACHRICHT SCHICKEN?!?
-				//...
-				std::cout << "Payload: " << payload << std::endl;
-				payload = "";
+				
+				if(rc == 0){
+					//string zu char* machen
+					const char* c = payload.c_str();
+					std::string topic = "/sienahome/" + std::to_string(this->getIp().Get());
+					//std::string topic = "test";
+					mosquitto_publish(mosq, NULL, topic.c_str(), payload.length(), c, 0, false); 
+					std::cout << "müsste verschickt sein o.O unter topic: " << topic << std::endl;
+				}
+				//std::cout << "Payload: " << payload << std::endl; //in der Konsole zum direkt pruefen
+
+				//payload = ""; //leer machen fuer naechsten Durchlauf
 			#endif
 			
 		}

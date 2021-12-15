@@ -599,6 +599,9 @@ def configure(conf):
     # for compiling C code, copy over the CXX* flags
     conf.env.append_value('CCFLAGS', conf.env['CXXFLAGS'])
 
+    # new MQTT Libraries
+    conf.env['mosquitto'] = conf.check(mandatory=True,lib='mosquitto',uselib_store='MOSQUITTO')
+
     def add_gcc_flag(flag):
         if env['COMPILER_CXX'] == 'g++' and 'CXXFLAGS' not in os.environ:
             if conf.check_compilation_flag(flag, mode='cxx'):

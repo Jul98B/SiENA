@@ -1,4 +1,5 @@
 #include "../../siena/scenario/Scenario.h"
+#include <iostream>
 
 namespace ns3 {
 
@@ -143,15 +144,32 @@ void Scenario::initRandom() {
 
 void Scenario::initSimpleDevice(std::string device, std::string devConfig, HomeConfig* home, MyConfig* config) {
 	//double r = random->getD();
+
+	//fuer Simple Devices aufgerufen: Drier, Dishwascher, Waschingmaschine, PV, Battery
+	//Moegl Parameter: Activation time (by residenst = siehe sim-models.md) und deadline
+
+	//Uergabeparameter:
+	//string device: name des Devices (z.B. drier)
+	//devConfig: nur fuer Battery genutzt, sonst leer ("")
+	//home: immer gleiches home
+	//config: aus der config Datei gelesen = da koennen sich alle Verteilungen geholt werden
+
 	int r2 = random->get();
-	double own = config->getDouble("own_" + device);
+	double own = config->getDouble("own_" + device); //config: Wahrscheinlichkeit 0-1 so ein Device zu besitzen 
 	int i;
-	for(i = 1; i <= (int) own; i++) {
-		home->addDevice(device + (own > 1 ? ":" + Helper::toString(i) : ""), devConfig, r2);
+
+	//std::cout << "config own: " << std::to_string(own) << device << std::endl;
+
+	//cast zu int wird 0 ???
+	for(i = 1; i <= (int) own; i++) { //wird nie ausgefuehrt
+		//std::cout << "i: " << std::to_string(i) << " device: " << device << std::endl;
+		home->addDevice(device + (own > 1 ? ":" + Helper::toString(i) : ""), devConfig, r2); //Zahl bei z.B. Auto anhaengen
 	}
-	own -= (int) own;
-	if(random->getDev(device))
-		home->addDevice(device + (own > 1 ? ":" + Helper::toString(i) : ""), devConfig, r2);
+	own -= (int) own; //was passiert hier? irgendwie nichts...
+	if(random->getDev(device)) { //"zufalls" Berechnung mit Config-Wahrscheinlichkeit ob Device hinzugefuegt wird
+		//std::cout << "-own: " << std::to_string(own) << " device: " << device << std::endl;
+		home->addDevice(device + (own > 1 ? ":" + Helper::toString(i) : ""), devConfig, r2); //Zahl bei z.B. Auto anhaengen
+	}
 }
 
 void Scenario::init(std::string scenario) {

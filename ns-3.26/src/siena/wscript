@@ -5,6 +5,7 @@ def configure(conf):
 def build(bld):
 	module = bld.create_ns3_module('siena', ['core', 'internet', 'flow-monitor', 'lte', 'plc', 'network', 'brite', 'nix-vector-routing']) # 'visualizer'
 	module.use.append('LIBJSONCPP')
+	module.use.append('MOSQUITTO')
 	module.source = [
 		'scenario/Scenario.cc',
 		'pandapower/Pandapower.cc',
@@ -37,10 +38,6 @@ def build(bld):
 		'simulator/DataBasis.cc',
 		'modules/network/tree/NetworkTree.cc'
 	]
-	
-	bld(use="mosquitto")
-	
-	module.uselib = 'mosquitto'
 	
 	headers = bld(features='ns3header')
 	headers.module = 'siena'

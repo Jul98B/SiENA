@@ -41,8 +41,8 @@ GridHome::GridHome() : ConventionalHome("error"), token(NULL), lastAdaption(-1) 
 		//client id, 
 		mosq = mosquitto_new(NULL, true, NULL);
 
-		mosquitto_username_pw_set(mosq,"eow","eow%EMA4");
-		rc = mosquitto_connect(mosq, "131.173.118.68", 18883, 60);
+		//mosquitto_username_pw_set(mosq,"name","password");
+		rc = mosquitto_connect(mosq, "IP", PORT, 60);
 
 		//rc = mosquitto_connect(mosq, "localhost", 1883, 60);
 		if(rc != 0){

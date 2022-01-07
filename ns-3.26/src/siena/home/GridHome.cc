@@ -11,7 +11,7 @@
 
 
 #define LOG
-//#define MQTT 
+#define MQTT 
 
 namespace ns3 {
 
@@ -34,17 +34,17 @@ GridHome::GridHome() : ConventionalHome("error"), token(NULL), lastAdaption(-1) 
 	packetLog = PacketLog::Get();
 	packetLogger = PacketLogger::Get();
 
-	#ifdef MQTT 
+	#ifdef MQTT
 		//MQTT verbindung erstellen:
 		mosquitto_lib_init();
 
 		//client id, 
 		mosq = mosquitto_new(NULL, true, NULL);
 
-		//mosquitto_username_pw_set(mosq,"name","password");
-		rc = mosquitto_connect(mosq, "IP", PORT, 60);
+		//mosquitto_username_pw_set(mosq,"name","PW");
+		//rc = mosquitto_connect(mosq, "IP", Port, 60);
 
-		//rc = mosquitto_connect(mosq, "localhost", 1883, 60);
+		rc = mosquitto_connect(mosq, "localhost", 1883, 60);
 		if(rc != 0){
 			printf("Client could not connect to broker! Error Code: %d\n", rc);
 			mosquitto_destroy(mosq);
@@ -68,16 +68,13 @@ void GridHome::StartApplication() {
 
 	ip = GetNode()->GetObject<Ipv4>()->GetAddress(1, 0).GetLocal();
 	communicator->registerRecipient(this, Helper::toString(ip));
-
-	
 }
 
 void GridHome::StopApplication() {
 	listenerSocket->Close();
-	//verbindung trennen und alles wieder aufraemen
+	//verbindung trennen und alles wieder aufraeumen
 	mosquitto_disconnect(mosq);
 	mosquitto_destroy(mosq);
-
 	mosquitto_lib_cleanup();
 }
 
@@ -166,27 +163,6 @@ Adaption* GridHome::getAdaption() {
 void GridHome::setAdaption() {
 
 	if(t->getTick() > lastAdaption) {
-		
-		#ifdef MQTT	
-			/*zu anfang jedes device einmal in Json schreiben
-			if(lastAdaption == 0){
-				std::string filename("gridhomes_config.txt");
-				std::ofstream file_out;
-
-				file_out.open(filename, std::ios_base::app); // statt app evtl out
-
-				//Config im Moment unnötig = nicht benutzen von toJson
-				//this->toJson(&payload); //JSON als Rueckgabe
-
-				std::cout << "config: " << payload << std::endl;
-
-				//hier einmal MQTT schicken????????????????????????????????????????????????????????????????????????????
-
-				payload = "";
-			} 
-			*/
-		#endif
-		
 
 		#ifdef LOG 
 			std::string filename("gridhome_setAdaption.txt"); //in diese Textdatei alle Logs schreiben
@@ -221,6 +197,14 @@ void GridHome::setAdaption() {
 			} else if(isdigit(deviceType[0])){ //dreistellige Gridhome Nummer: zwei mehr abschneiden
 				deviceType = deviceType.substr(2,deviceType.length());
 			}
+
+			//Trennzeichen bei Nummerierung tauschen von ":" zu "_"
+			std::size_t pos = deviceType.find(":", 0);
+
+			if(pos != std::string::npos){ //wenn gefunden
+				deviceType[pos] = '_';
+			}
+
 			#endif
 
 			#ifdef LOG 
@@ -309,7 +293,7 @@ void GridHome::setAdaption() {
 					std::string topic = "/sienahome/" + std::to_string(this->getIp().Get());
 					//std::string topic = "test";
 					mosquitto_publish(mosq, NULL, topic.c_str(), payload.length(), c, 0, false); 
-					std::cout << "müsste verschickt sein o.O unter topic: " << topic << std::endl;
+					//std::cout << "müsste verschickt sein o.O unter topic: " << topic << std::endl;
 				}
 				//std::cout << "Payload: " << payload << std::endl; //in der Konsole zum direkt pruefen
 
@@ -319,122 +303,3 @@ void GridHome::setAdaption() {
 		}
 	}
 }
-	
-/*
-void GridHome::toJson(std::string* payload){  //evtl MQTT raus schmeißen oder woanders in h oder so einbinden?
-/* später richten und angleichen...
-	std::string DFLT_SERVER_ADDRESS { "tcp://localhost:1883" };
-
-		std::string TOPIC { "test" };
-		int QOS = 0;
-
-		const char* PAYLOADS[] = {
-			"Hello World!",
-			"Hi there!",
-			"Is anyone listening?",
-			"Someone is always listening.",
-			nullptr
-		};
-
-		const auto TIMEOUT = std::chrono::seconds(10);
-
-
-		//MQTT client anlegen:
-
-		//aus ner main kopiert = adresse selber definieren?
-		std::string address = "eine Adresse";//(argc > 1) ? std::string(argv[1]) : DFLT_SERVER_ADDRESS;
-
-		std::cout << "Initializing for server '" << address << "'..." << std::endl;
-		mqtt::async_client cli(address, "");
-
-		std::cout << "  ...OK" << std::endl;
-
-		try {
-			std::cout << "\nConnecting..." << std::endl;
-			cli.connect()->wait();
-			std::cout << "  ...OK" << std::endl;
-
-			std::cout << "\nPublishing messages..." << std::endl;
-
-			mqtt::topic top(cli, "test", QOS);
-			mqtt::token_ptr tok;
-
-			size_t i = 0;
-			while (PAYLOADS[i]) {
-				tok = top.publish(PAYLOADS[i++]);
-			}
-			tok->wait();	// Just wait for the last one to complete.
-			std::cout << "OK" << std::endl;
-
-			// Disconnect
-			std::cout << "\nDisconnecting..." << std::endl;
-			cli.disconnect()->wait();
-			std::cout << "  ...OK" << std::endl;
-		}
-		catch (const mqtt::exception& exc) {
-			std::cerr << exc << std::endl;
-		}
-#ifdef LOG  //payload musste noch raus genommen werden , wenn Config Dateidoch gebraucht wird
-	std::string filename("gridhomes_config.txt");
-	std::ofstream file_out;
-
-	file_out.open(filename, std::ios_base::app); // statt app evtl out
-	
-	file_out <<  "{  \\n \n";
-	(*payload) += "{  \\n \n";
-
-	//ip
-	file_out << "\"ip\": " << this->getIp() << ", \\n \n";
-	(*payload) += "\"ip\": " + std::to_string(this->getIp().Get()) + ", \\n \n";
-
-	//devices
-	file_out << "\"devices\": [ \\n \n"; 
-	(*payload) += "\"devices\": [ \\n \n";
-
-	std::map<std::string, Device*>::iterator it;
-	for(it = devices.begin(); it != devices.end(); ++it) {
-		file_out << "{ "; 
-		(*payload) += "{ ";
-		
-		if(!(std::string(typeid(*it->second).name())).compare("N3ns33CarE")){
-			try {
-				//file_
-				std::ostringstream strs;
-				strs << it->second->getId();
-
-				file_out << "\"deviceId\": car;";
-				(*payload) += "\"deviceId\": car;";
-
-				file_out << "\"Fuel\": " << dynamic_cast<Car*>(it->second)->getFuelEconomy();
-				(*payload) += "\"Fuel\":" + std::to_string(dynamic_cast<Car*>(it->second)->getFuelEconomy());
-				
-			} catch (const std::exception& e) {
-				file_out << "shit \n";
-				(*payload) += "shit \n";
-			}
-			
-		} else {
-			std::string id = it->second->getId();
-
-			std::string deviceType = id.substr(13, id.length());
-
-			if(deviceType[0] == '_'){ //zweistellige GridHome Nummer: einen mehr abschneiden
-				deviceType = deviceType.substr(1,deviceType.length());
-			} else if(isdigit(deviceType[0])){ //dreistellige Gridhome Nummer: zwei mehr abschneiden
-				deviceType = deviceType.substr(2,deviceType.length());
-			}
-
-			file_out << "\"deviceId\": " << deviceType;
-			(*payload) += "\"deviceId\": " + deviceType;
-		}
-
-		file_out << "} \\n \n"; 
-		(*payload) += "} \\n \n";
-
-	}
-
-	file_out << " ] \\n \n} \\n \n";
-	(*payload) += " ] \\n \n} \\n \n";
-
-}
-*/

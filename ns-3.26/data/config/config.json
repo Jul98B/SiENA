@@ -4,8 +4,8 @@
 
 
 	"start_date": "01.03.11",			// start date of simulation, has to comply with data_start_date
-	"duration": "1d",					// duration of simulation, y (years), d (days), h (hours), min (minutes)
-	"interval": "30min",					// simulation step interval
+	"duration": "5d",					// duration of simulation, y (years), d (days), h (hours), min (minutes)
+	"interval": "5min",					// simulation step interval
 	"log_all": false,					// show log messages, slows down simulation, check src/simulation/Turbo.h for even more speed
 	"data_start_date": "01.01.11",		// start date of data, currently data available from 01.01.11 to 31.12.13
 										//   -> this date is tick 0

@@ -187,7 +187,7 @@ void GridHome::setAdaption() {
 		std::map<std::string, Device*>::iterator it;
 		for(it = devices.begin(); it != devices.end(); ++it) { //durch Liste aller Devices dieses Gridhomes itterieren
 			
-			#ifdef LOG || MQTT
+			//#ifdef LOG || MQTT
 			//devicetype aus der kompletten id holen und ende Abschneiden (angehängte Zahlen bleiben bestehen)
 			std::string id = it->second->getId();
 			std::string deviceType = id.substr(13, id.length()); //Home und Clusternummer abschneiden 
@@ -205,7 +205,7 @@ void GridHome::setAdaption() {
 				deviceType[pos] = '_';
 			}
 
-			#endif
+			//#endif
 
 			#ifdef LOG 
 				file_out << "\"" << deviceType << "\":{";

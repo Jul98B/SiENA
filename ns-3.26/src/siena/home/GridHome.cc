@@ -226,6 +226,18 @@ void GridHome::setAdaption() {
 				#endif
 			} 
 
+			if(deviceType == "battery"){ //Ladestand der Battery
+				std::cout << "battery gefunden" << std::endl;
+				#ifdef LOG 
+					file_out << "\"charge\":" << std::to_string(dynamic_cast<Battery*>(it->second)->getCharge()) << ",";
+				#endif
+
+				#ifdef MQTT
+					payload += "\"charge\":" + std::to_string(dynamic_cast<Battery*>(it->second)->getCharge()) + ",";
+				#endif
+
+			}
+
 			//moegliche Energieverschiebung und aktuellen Verbrauch fuer neuen Zeitpunkt setzen
 			if(it->second->isAdaptable()) {
 				std::pair<AdaptionFlex*, AdaptionOnOff*> a = it->second->getAdaption();
